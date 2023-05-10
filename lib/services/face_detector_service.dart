@@ -10,6 +10,8 @@ class FaceDetectorService {
 
   bool get isFaceDetected => _faces.isNotEmpty;
 
+  bool _isBusy = false;
+
   void initialize() {
     _faceDetector = FaceDetector(
         options: FaceDetectorOptions(
@@ -18,7 +20,10 @@ class FaceDetectorService {
   }
 
   Future<void> detectFace(InputImage inputImage) async {
+    if (_isBusy) return;
+    _isBusy = true;
     _faces = await _faceDetector.processImage(inputImage);
+    _isBusy = false;
   }
 
   void dispose() {
