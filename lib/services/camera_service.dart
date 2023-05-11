@@ -28,8 +28,11 @@ class CameraService {
   }
 
   Future _setupCameraController() async {
-    _cameraController =
-        CameraController(_camera, ResolutionPreset.max, enableAudio: false);
+    _cameraController = CameraController(
+      _camera,
+      ResolutionPreset.max,
+      enableAudio: false,
+    );
 
     await _cameraController?.initialize();
   }

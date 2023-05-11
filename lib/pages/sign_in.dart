@@ -4,6 +4,7 @@ import 'package:camera_demo/services/camera_service.dart';
 import 'package:camera_demo/services/face_detector_service.dart';
 import 'package:camera_demo/services/face_vector_service.dart';
 import 'package:camera_demo/services/ml_service.dart';
+import 'package:camera_demo/utils/face_detector_painter.dart';
 import 'package:camera_demo/widgets/camera_view.dart';
 import 'package:flutter/material.dart';
 
@@ -17,6 +18,7 @@ class SignInPage extends StatefulWidget {
 class _SignInPageState extends State<SignInPage> {
   bool _initializing = false;
   bool _isBusy = false;
+  CustomPaint? _customPaint;
   final TextEditingController _nameController = TextEditingController();
 
   final FaceDetectorService _faceDetectorService =
@@ -61,18 +63,26 @@ class _SignInPageState extends State<SignInPage> {
 
       if (_faceDetectorService.isFaceDetected) {
         final faces = _faceDetectorService.faces;
+        final inputImage = _cameraService.inputImage;
+        final painter = FaceDetectorPainter(
+            faces,
+            inputImage!.inputImageData!.size,
+            inputImage.inputImageData!.imageRotation);
 
+        _customPaint = CustomPaint(painter: painter);
         await _mlService.predict(image, faces[0]);
-
-        if (mounted) {
-          setState(() {});
-        }
-        _isBusy = false;
+      } else {
+        _customPaint = null;
       }
+      if (mounted) {
+        setState(() {});
+      }
+      _isBusy = false;
     });
   }
 
   Future<void> _showDialog(BuildContext context) {
+    _cameraService.cameraController!.stopImageStream();
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -84,6 +94,7 @@ class _SignInPageState extends State<SignInPage> {
                   padding: const EdgeInsets.all(20.0),
                   child: TextField(
                     decoration: const InputDecoration(labelText: '姓名'),
+                    autofocus: true,
                     controller: _nameController,
                   )),
               Row(
@@ -116,6 +127,7 @@ class _SignInPageState extends State<SignInPage> {
         : Stack(
             children: [
               CameraView(
+                customPaint: _customPaint,
                 text: null,
               ),
               Positioned(

@@ -3,8 +3,10 @@ import 'package:camera_demo/locator.dart';
 import 'package:camera_demo/services/camera_service.dart';
 import 'package:camera_demo/services/face_detector_service.dart';
 import 'package:camera_demo/services/ml_service.dart';
+import 'package:camera_demo/utils/face_detector_painter.dart';
 import 'package:camera_demo/widgets/camera_view.dart';
 import 'package:flutter/material.dart';
+import 'package:wakelock/wakelock.dart';
 
 class FaceCheckPage extends StatefulWidget {
   const FaceCheckPage({super.key});
@@ -16,6 +18,7 @@ class FaceCheckPage extends StatefulWidget {
 class _FaceCheckPageState extends State<FaceCheckPage> {
   bool _initializing = false;
   bool _isBusy = false;
+  CustomPaint? _customPaint;
 
   String? _text;
 
@@ -29,6 +32,7 @@ class _FaceCheckPageState extends State<FaceCheckPage> {
   @override
   void initState() {
     _start();
+    Wakelock.toggle(enable: true);
     super.initState();
   }
 
@@ -36,6 +40,7 @@ class _FaceCheckPageState extends State<FaceCheckPage> {
   void dispose() {
     _cameraService.dispose();
     _faceDetectorService.dispose();
+    Wakelock.toggle(enable: false);
     super.dispose();
   }
 
@@ -59,14 +64,22 @@ class _FaceCheckPageState extends State<FaceCheckPage> {
 
       if (_faceDetectorService.isFaceDetected) {
         final faces = _faceDetectorService.faces;
+        final inputImage = _cameraService.inputImage;
+        final painter = FaceDetectorPainter(
+            faces,
+            inputImage!.inputImageData!.size,
+            inputImage.inputImageData!.imageRotation);
 
+        _customPaint = CustomPaint(painter: painter);
         await _mlService.predict(image, faces[0]);
         _text = _mlService.person;
-        if (mounted) {
-          setState(() {});
-        }
-        _isBusy = false;
+      } else {
+        _customPaint = null;
       }
+      if (mounted) {
+        setState(() {});
+      }
+      _isBusy = false;
     });
   }
 
@@ -74,6 +87,6 @@ class _FaceCheckPageState extends State<FaceCheckPage> {
   Widget build(BuildContext context) {
     return _initializing
         ? const Center(child: CircularProgressIndicator())
-        : CameraView(text: _text);
+        : CameraView(customPaint: _customPaint, text: _text);
   }
 }

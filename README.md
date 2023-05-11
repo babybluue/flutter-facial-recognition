@@ -1,16 +1,15 @@
-# camera_demo
+Flutter 离线人脸识别 Demo，使用 Google ML Kit/Tensorflow Lite,识别模型基于 FaceNet
 
-A new Flutter project.
+#### 基本思路
 
-## Getting Started
+#### 知识扫盲
 
-This project is a starting point for a Flutter application.
+#### 相关文档
 
-A few resources to get you started if this is your first Flutter project:
+#### 目录说明
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- services
+  - camera_service 摄像头调用服务
+  - face_detector_service 人脸识别服务
+  - face_vector_service 存放录入的人脸/姓名
+  - ml_service 调用人脸识别模型
