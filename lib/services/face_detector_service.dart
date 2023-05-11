@@ -26,7 +26,7 @@ class FaceDetectorService {
     _isBusy = false;
   }
 
-  void dispose() {
-    _faceDetector.close();
+  Future<void> dispose() async {
+    await _faceDetector.close();
   }
 }

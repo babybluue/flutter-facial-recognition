@@ -37,15 +37,17 @@ class _SignInPageState extends State<SignInPage> {
   }
 
   @override
-  void dispose() {
-    _cameraService.dispose();
-    _faceDetectorService.dispose();
+  void dispose() async {
+    await _cameraService.dispose();
+    await _faceDetectorService.dispose();
     super.dispose();
+    _mlService.dispose();
   }
 
   _start() async {
     setState(() => _initializing = true);
     await _cameraService.initialize();
+    await _mlService.initialize();
     _faceDetectorService.initialize();
     setState(() => _initializing = false);
     _detectFace();

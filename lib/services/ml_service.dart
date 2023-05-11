@@ -18,12 +18,21 @@ class MLService {
 
   final FaceVectorService _faceVectorService = locator<FaceVectorService>();
 
+  Future initialize() async {
+    await initializeInterpreter();
+  }
+
+  void dispose() {
+    interpreter.close();
+  }
+
   Future predict(CameraImage cameraImage, Face face) async {
     List input = _preProcess(cameraImage, face);
+
     input = input.reshape([1, 112, 112, 3]);
 
     List output = List.generate(1, (index) => List.filled(192, 0));
-    await initializeInterpreter();
+
     interpreter.run(input, output);
 
     output = output.reshape([192]);
@@ -31,33 +40,16 @@ class MLService {
     predictArray = List.from(output);
 
     final result = await _searchResult();
+
     person = result;
   }
 
   Future initializeInterpreter() async {
-    Delegate? delegate;
     try {
-      if (Platform.isAndroid) {
-        delegate = GpuDelegateV2(
-            options: GpuDelegateOptionsV2(
-          isPrecisionLossAllowed: false,
-          inferencePreference: TfLiteGpuInferenceUsage.fastSingleAnswer,
-          inferencePriority1: TfLiteGpuInferencePriority.minLatency,
-          inferencePriority2: TfLiteGpuInferencePriority.auto,
-          inferencePriority3: TfLiteGpuInferencePriority.auto,
-        ));
-      } else if (Platform.isIOS) {
-        delegate = GpuDelegate(
-          options: GpuDelegateOptions(
-              allowPrecisionLoss: true,
-              waitType: TFLGpuDelegateWaitType.active),
-        );
-      }
-      var interpreterOptions = InterpreterOptions()..addDelegate(delegate!);
-
       interpreter = await Interpreter.fromAsset('mobilefacenet.tflite');
     } catch (e) {
       print('Failed to load model.');
+      print(e);
     }
   }
 
