@@ -37,11 +37,8 @@ class _FaceCheckPageState extends State<FaceCheckPage> {
   }
 
   @override
-  void dispose() async {
-    await _cameraService.dispose();
-    await _faceDetectorService.dispose();
-    _mlService.dispose();
-    Wakelock.toggle(enable: false);
+  void dispose() {
+    _end();
     super.dispose();
   }
 
@@ -52,6 +49,13 @@ class _FaceCheckPageState extends State<FaceCheckPage> {
     await _mlService.initialize();
     setState(() => _initializing = false);
     _detectFace();
+  }
+
+  _end() async {
+    await _cameraService.dispose();
+    await _faceDetectorService.dispose();
+    _mlService.dispose();
+    Wakelock.toggle(enable: false);
   }
 
   _detectFace() {
