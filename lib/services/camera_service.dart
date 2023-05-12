@@ -77,7 +77,8 @@ class CameraService {
         InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
   }
 
-  Future<void> dispose() async {
+  dispose() async {
+    await _cameraController?.stopImageStream();
     await _cameraController?.dispose();
     _cameraController = null;
   }

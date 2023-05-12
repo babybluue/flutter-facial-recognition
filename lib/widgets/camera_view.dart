@@ -1,13 +1,12 @@
 import 'package:camera/camera.dart';
 import 'package:camera_demo/locator.dart';
 import 'package:camera_demo/services/camera_service.dart';
-import 'package:camera_demo/services/face_detector_service.dart';
 import 'package:flutter/material.dart';
 
 class CameraView extends StatefulWidget {
-  CameraView({required this.customPaint, required this.text, super.key});
+  const CameraView({required this.customPaint, required this.text, super.key});
 
-  CustomPaint? customPaint;
+  final CustomPaint? customPaint;
 
   final String? text;
 
@@ -17,9 +16,6 @@ class CameraView extends StatefulWidget {
 
 class _CameraViewState extends State<CameraView> {
   final CameraService _cameraService = locator<CameraService>();
-
-  final FaceDetectorService _faceDetectorService =
-      locator<FaceDetectorService>();
 
   @override
   Widget build(BuildContext context) {

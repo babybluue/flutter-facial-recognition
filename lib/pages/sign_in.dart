@@ -37,7 +37,7 @@ class _SignInPageState extends State<SignInPage> {
   }
 
   @override
-  void dispose() async {
+  void dispose() {
     _end();
     super.dispose();
   }
@@ -45,16 +45,12 @@ class _SignInPageState extends State<SignInPage> {
   _start() async {
     setState(() => _initializing = true);
     await _cameraService.initialize();
-    await _mlService.initialize();
-    _faceDetectorService.initialize();
     setState(() => _initializing = false);
     _detectFace();
   }
 
-  _end() async {
-    await _cameraService.dispose();
-    await _faceDetectorService.dispose();
-    _mlService.dispose();
+  _end() {
+    _cameraService.dispose();
   }
 
   _detectFace() {
@@ -92,7 +88,6 @@ class _SignInPageState extends State<SignInPage> {
   }
 
   Future<void> _showDialog(BuildContext context) {
-    _cameraService.cameraController!.stopImageStream();
     return showDialog(
       context: context,
       builder: (BuildContext context) {

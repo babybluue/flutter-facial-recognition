@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:camera/camera.dart';
 import 'package:camera_demo/locator.dart';
 import 'package:camera_demo/services/camera_service.dart';
@@ -8,7 +6,6 @@ import 'package:camera_demo/services/ml_service.dart';
 import 'package:camera_demo/utils/face_detector_painter.dart';
 import 'package:camera_demo/widgets/camera_view.dart';
 import 'package:flutter/material.dart';
-import 'package:wakelock/wakelock.dart';
 
 class FaceCheckPage extends StatefulWidget {
   const FaceCheckPage({super.key});
@@ -33,9 +30,8 @@ class _FaceCheckPageState extends State<FaceCheckPage> {
 
   @override
   void initState() {
-    _start();
-    Wakelock.toggle(enable: true);
     super.initState();
+    _start();
   }
 
   @override
@@ -47,17 +43,12 @@ class _FaceCheckPageState extends State<FaceCheckPage> {
   _start() async {
     setState(() => _initializing = true);
     await _cameraService.initialize();
-    _faceDetectorService.initialize();
-    await _mlService.initialize();
     setState(() => _initializing = false);
     _detectFace();
   }
 
-  _end() async {
-    await _cameraService.dispose();
-    await _faceDetectorService.dispose();
-    _mlService.dispose();
-    Wakelock.toggle(enable: false);
+  _end() {
+    _cameraService.dispose();
   }
 
   _detectFace() {
