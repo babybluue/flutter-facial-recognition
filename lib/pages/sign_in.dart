@@ -58,8 +58,10 @@ class _SignInPageState extends State<SignInPage> {
   }
 
   _detectFace() {
+    var startTime = DateTime.now().microsecondsSinceEpoch;
     _cameraService.cameraController
         ?.startImageStream((CameraImage image) async {
+      final endTime = DateTime.now().microsecondsSinceEpoch;
       if (_cameraService.cameraController == null) return;
       if (_isBusy) return;
       _isBusy = true;
@@ -74,9 +76,11 @@ class _SignInPageState extends State<SignInPage> {
             faces,
             inputImage!.inputImageData!.size,
             inputImage.inputImageData!.imageRotation);
-
         _customPaint = CustomPaint(painter: painter);
-        await _mlService.predict(image, faces[0]);
+        if (endTime - startTime > 10000) {
+          await _mlService.predict(image, faces[0]);
+          startTime = DateTime.now().microsecondsSinceEpoch;
+        }
       } else {
         _customPaint = null;
       }

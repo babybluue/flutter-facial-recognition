@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:camera/camera.dart';
 import 'package:camera_demo/locator.dart';
 import 'package:camera_demo/services/camera_service.dart';
@@ -59,8 +61,10 @@ class _FaceCheckPageState extends State<FaceCheckPage> {
   }
 
   _detectFace() {
+    var startTime = DateTime.now().microsecondsSinceEpoch;
     _cameraService.cameraController
         ?.startImageStream((CameraImage image) async {
+      final endTime = DateTime.now().microsecondsSinceEpoch;
       if (_cameraService.cameraController == null) return;
       if (_isBusy) return;
       _isBusy = true;
@@ -78,8 +82,11 @@ class _FaceCheckPageState extends State<FaceCheckPage> {
             inputImage.inputImageData!.imageRotation);
 
         _customPaint = CustomPaint(painter: painter);
-        await _mlService.predict(image, faces[0]);
-        _text = _mlService.person;
+        if (endTime - startTime > 10000) {
+          await _mlService.predict(image, faces[0]);
+          _text = _mlService.person;
+          startTime = DateTime.now().microsecondsSinceEpoch;
+        }
       } else {
         _customPaint = null;
       }
